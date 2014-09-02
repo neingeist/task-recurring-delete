@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# For taskwarrior users:
-# Delete all overdue & duplicate tasks and keep only the first of a kind.
+# Delete all overdue, recurring & duplicate taskwarrior tasks and keep only the
+# first of a kind.
 #
 # Needs the taskw Python bindings to run.
 
