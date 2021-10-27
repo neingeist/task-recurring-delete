@@ -1,0 +1,27 @@
+#!/usr/bin/python3
+import datetime
+from taskw import TaskWarrior
+from pprint import pprint
+from operator import itemgetter
+from itertools import groupby
+
+
+w = TaskWarrior(marshal=True)
+tasks = w.load_tasks()["pending"]
+tasks = list(filter(lambda t: t.get("status") == "pending", tasks))
+
+# Recurring tasks have a "parent"
+tasks = list(filter(lambda t: t.get("parent") is not None, tasks))
+
+for k, g in groupby(sorted(tasks, key=itemgetter("parent")), key=itemgetter("parent")):
+    # Postpone all but the two most urgent tasks
+    to_postpone = sorted(g, key=itemgetter("urgency"))[:-2]
+    if not to_postpone:
+        continue
+
+    print(f"Postponing {len(to_postpone)}x {to_postpone[0]['description']}")
+    for t in to_postpone:
+        t["status"] = "waiting"
+        t["wait"] = datetime.datetime.combine(datetime.date.today(), datetime.datetime.min.time()) \
+                        + datetime.timedelta(days=1)
+        w.task_update(t)
